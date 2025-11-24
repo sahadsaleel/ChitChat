@@ -4,14 +4,15 @@ import { useChatStore } from "../store/useChatStore";
 import { UserPlus, UserMinus, Ban, Check, X } from "lucide-react";
 
 const FriendList = () => {
-    const { friends, getFriends, sendFriendRequest, acceptFriendRequest, rejectFriendRequest, blockUser } = useFriendStore();
+    const { friends, friendRequests, getFriends, getFriendRequests, sendFriendRequest, acceptFriendRequest, rejectFriendRequest, blockUser } = useFriendStore();
     const { setSelectedUser } = useChatStore();
     const [addFriendId, setAddFriendId] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
 
     useEffect(() => {
         getFriends();
-    }, [getFriends]);
+        getFriendRequests();
+    }, [getFriends, getFriendRequests]);
 
     const handleAddFriend = async (e) => {
         e.preventDefault();
@@ -32,6 +33,52 @@ const FriendList = () => {
             </div>
 
             <div className="overflow-y-auto flex-1 py-2">
+                {/* Friend Requests Section */}
+                {friendRequests.length > 0 && (
+                    <div className="mb-6">
+                        <h4 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                            Friend Requests ({friendRequests.length})
+                        </h4>
+                        {friendRequests.map((request) => (
+                            <div
+                                key={request._id}
+                                className="w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors"
+                            >
+                                <div className="relative">
+                                    <img
+                                        src={request.senderId.profilePic || "/avatar.png"}
+                                        alt={request.senderId.fullName}
+                                        className="size-10 object-cover rounded-full"
+                                    />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="font-medium truncate">{request.senderId.fullName}</div>
+                                    <div className="text-xs text-zinc-400">ID: {request.senderId.shortId}</div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => acceptFriendRequest(request.senderId._id)}
+                                        className="btn btn-sm bg-[#256494] hover:bg-[#1b496d] text-white border-none"
+                                    >
+                                        Accept
+                                    </button>
+                                    <button
+                                        onClick={() => rejectFriendRequest(request.senderId._id)}
+                                        className="btn btn-sm btn-ghost text-red-500 hover:bg-red-50"
+                                    >
+                                        Reject
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                        <div className="divider my-2"></div>
+                    </div>
+                )}
+
+                {/* Friends List Section */}
+                <h4 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                    All Friends ({friends.length})
+                </h4>
                 {friends.length === 0 ? (
                     <div className="text-center text-zinc-500 py-4">No friends yet</div>
                 ) : (

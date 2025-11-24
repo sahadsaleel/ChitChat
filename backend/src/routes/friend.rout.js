@@ -7,6 +7,7 @@ import {
     getFriends,
     blockUser,
     unblockUser,
+    getFriendRequests,
 } from "../controllers/friend.controller.js";
 
 const router = express.Router();
@@ -15,6 +16,7 @@ router.post("/request/:id", protectRoute, sendFriendRequest);
 router.post("/accept/:id", protectRoute, acceptFriendRequest);
 router.post("/reject/:id", protectRoute, rejectFriendRequest);
 router.get("/", protectRoute, getFriends);
+router.get("/requests", protectRoute, getFriendRequests);
 router.post("/block/:id", protectRoute, blockUser);
 router.post("/unblock/:id", protectRoute, unblockUser);
 

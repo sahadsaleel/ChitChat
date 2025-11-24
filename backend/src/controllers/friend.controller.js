@@ -153,3 +153,26 @@ export const unblockUser = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
+export const getFriendRequests = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        const user = await User.findById(userId).populate({
+            path: "friendRequests.senderId",
+            select: "fullName profilePic shortId"
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Filter only pending requests
+        const pendingRequests = user.friendRequests.filter(req => req.status === "pending");
+
+        res.status(200).json(pendingRequests);
+    } catch (error) {
+        console.log("Error in getFriendRequests:", error.message);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};

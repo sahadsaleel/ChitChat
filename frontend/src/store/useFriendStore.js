@@ -4,7 +4,9 @@ import toast from "react-hot-toast";
 
 export const useFriendStore = create((set, get) => ({
     friends: [],
+    friendRequests: [],
     isLoadingFriends: false,
+    isLoadingRequests: false,
 
     getFriends: async () => {
         set({ isLoadingFriends: true });
@@ -15,6 +17,19 @@ export const useFriendStore = create((set, get) => ({
             toast.error(error?.response?.data?.message || "Failed to fetch friends");
         } finally {
             set({ isLoadingFriends: false });
+        }
+    },
+
+    getFriendRequests: async () => {
+        set({ isLoadingRequests: true });
+        try {
+            const res = await axiosInstance.get("/friend/requests");
+            set({ friendRequests: res.data });
+        } catch (error) {
+            console.log("Error fetching friend requests:", error);
+            // toast.error(error?.response?.data?.message || "Failed to fetch friend requests");
+        } finally {
+            set({ isLoadingRequests: false });
         }
     },
 
@@ -31,7 +46,8 @@ export const useFriendStore = create((set, get) => ({
         try {
             await axiosInstance.post(`/friend/accept/${userId}`);
             toast.success("Friend request accepted");
-            get().getFriends(); // Refresh list
+            get().getFriends(); // Refresh friends list
+            get().getFriendRequests(); // Refresh requests list
         } catch (error) {
             toast.error(error?.response?.data?.message || "Failed to accept request");
         }
@@ -41,6 +57,7 @@ export const useFriendStore = create((set, get) => ({
         try {
             await axiosInstance.post(`/friend/reject/${userId}`);
             toast.success("Friend request rejected");
+            get().getFriendRequests(); // Refresh requests list
         } catch (error) {
             toast.error(error?.response?.data?.message || "Failed to reject request");
         }
