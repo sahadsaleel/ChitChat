@@ -8,6 +8,8 @@ import path from "path";
 
 import authRoutes from "./routes/auth.rout.js";
 import messageRoutes from "./routes/message.rout.js";
+import friendRoutes from "./routes/friend.rout.js";
+import groupRoutes from "./routes/group.rout.js";
 
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -46,6 +48,8 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
+app.use("/api/friend", friendRoutes);
+app.use("/api/group", groupRoutes);
 
 if (process.env.NODE_ENV === "production") {
   const frontendPath = path.join(__dirname, "../frontend/dist");

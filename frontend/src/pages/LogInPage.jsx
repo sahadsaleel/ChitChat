@@ -3,11 +3,13 @@ import { MessageSquare, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
+import TwoFactorVerify from "../components/TwoFactorVerify";
 
 export default function LoginPage() {
   const navigate = useNavigate();
 
   const login = useAuthStore((state) => state.login);
+  const verify2FA = useAuthStore((state) => state.verify2FA);
   const isLoggingIn = useAuthStore((state) => state.isLoggingIn);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -15,6 +17,7 @@ export default function LoginPage() {
     email: "",
     password: "",
   });
+  const [show2FA, setShow2FA] = useState(false);
 
   const handleSubmit = async () => {
     if (!formData.email || !formData.password) {
@@ -22,13 +25,31 @@ export default function LoginPage() {
       return;
     }
 
-    const success = await login(formData);
+    const result = await login(formData);
 
-    if (success) {
-      toast.success("Logged in successfully! 🎉");
+    if (result.is2FARequired) {
+      setShow2FA(true);
+    } else if (result.success) {
       navigate("/"); // redirect home
     }
   };
+
+  const handle2FAVerify = async (token) => {
+    const success = await verify2FA({ ...formData, twoFactorToken: token });
+    if (success) {
+      navigate("/");
+    }
+  };
+
+  if (show2FA) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#256494" }}>
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
+          <TwoFactorVerify onVerified={handle2FAVerify} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

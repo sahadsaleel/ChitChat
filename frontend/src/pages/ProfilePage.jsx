@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Mail, User, Calendar, Info, ChevronRight, X } from "lucide-react";
+import TwoFactorSetup from "../components/TwoFactorSetup";
+import toast from "react-hot-toast";
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
@@ -117,6 +119,24 @@ const ProfilePage = () => {
             </div>
           </div>
 
+          {/* User ID */}
+          <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl shadow-lg p-4 sm:p-5 border border-white border-opacity-20 hover:bg-opacity-15 transition-all cursor-pointer"
+            onClick={() => {
+              navigator.clipboard.writeText(authUser?._id);
+              toast.success("ID copied to clipboard");
+            }}
+          >
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="bg-blue-500 bg-opacity-30 p-2.5 sm:p-3 rounded-xl">
+                <User className="w-5 h-5 sm:w-6 sm:h-6 text-blue-200" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-blue-600 text-xs sm:text-sm font-medium">User ID (Click to Copy)</p>
+                <p className="text-black text-sm sm:text-base mt-1 truncate font-mono">{authUser?._id}</p>
+              </div>
+            </div>
+          </div>
+
           {/* Member Since */}
           <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl shadow-lg p-4 sm:p-5 border border-white border-opacity-20 hover:bg-opacity-15 transition-all">
             <div className="flex items-center gap-3 sm:gap-4">
@@ -143,13 +163,18 @@ const ProfilePage = () => {
             🔒 Your profile is visible to your contacts
           </p>
         </div>
+
+        {/* 2FA Setup */}
+        <div className="mt-6">
+          <TwoFactorSetup />
+        </div>
       </div>
 
       {/* About Edit Modal */}
       {isEditingAbout && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-2xl w-11/12 sm:w-96 shadow-xl relative">
-            
+
             <button
               onClick={() => setIsEditingAbout(false)}
               className="absolute top-3 right-3 text-gray-500 hover:text-black"
